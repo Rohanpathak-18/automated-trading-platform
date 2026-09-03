@@ -10,7 +10,6 @@ const createExecution = async ({
     order: order._id,
   });
 
-  // Prevent duplicate execution records
   if (existingExecution) {
     return existingExecution;
   }
@@ -34,18 +33,6 @@ const createExecution = async ({
   return execution;
 };
 
-const getUserExecutions = async (userId) => {
-  return Execution.find({
-    user: userId,
-  })
-    .populate(
-      "order",
-      "symbol exchange transactionType orderType"
-    )
-    .sort({ executedAt: -1 });
-};
-
 module.exports = {
   createExecution,
-  getUserExecutions,
 };

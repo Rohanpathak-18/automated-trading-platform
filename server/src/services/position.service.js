@@ -15,14 +15,13 @@ const updatePosition = async ({
     expiryDate: order.expiryDate,
   });
 
-  // No existing position
   if (!position) {
-    const quantity =
+    const initialQuantity =
       order.transactionType === "BUY"
         ? execution.quantity
         : -execution.quantity;
 
-    return Position.create({
+    const newPosition = await Position.create({
       user: order.user,
       brokerAccount: order.brokerAccount,
 
@@ -33,30 +32,28 @@ const updatePosition = async ({
       strikePrice: order.strikePrice,
       expiryDate: order.expiryDate,
 
-      quantity,
+      quantity: initialQuantity,
       averagePrice: execution.price,
-
       realizedPnL: 0,
       unrealizedPnL: 0,
     });
+
+    return newPosition;
   }
 
-  // BUY
   if (order.transactionType === "BUY") {
-    const oldQuantity = position.quantity;
-    const newQuantity =
-      oldQuantity + execution.quantity;
+    const totalQuantity =
+      position.quantity + execution.quantity;
 
     position.averagePrice =
       (
-        oldQuantity * position.averagePrice +
+        position.quantity * position.averagePrice +
         execution.quantity * execution.price
-      ) / newQuantity;
+      ) / totalQuantity;
 
-    position.quantity = newQuantity;
+    position.quantity = totalQuantity;
   }
 
-  // SELL
   if (order.transactionType === "SELL") {
     position.quantity -= execution.quantity;
   }
@@ -66,6 +63,18 @@ const updatePosition = async ({
   return position;
 };
 
+const getUserPositions = async (userId) => {
+  return Position.find({
+    user: userId,
+  })
+    .populate(
+      "brokerAccount",
+      "broker accountName"
+    )
+    .sort({ updatedAt: -1 });
+};
+
 module.exports = {
   updatePosition,
+  getUserPositions,
 };
