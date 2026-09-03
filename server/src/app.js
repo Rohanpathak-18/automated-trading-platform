@@ -8,6 +8,12 @@ const userRoutes = require("./routes/user.routes");
 const brokerRoutes = require("./routes/broker.routes");
 const authorizationRoutes = require("./routes/authorization.routes");
 const orderRoutes = require("./routes/order.routes");
+const executionRoutes = require("./routes/execution.routes");
+const positionRoutes = require("./routes/position.routes");
+const strategyRoutes = require("./routes/strategy.routes");
+const strategyAssignmentRoutes = require("./routes/strategyAssignment.routes");
+const strategySignalRoutes = require("./routes/strategySignal.routes");
+const auditRoutes = require("./routes/audit.routes");
 
 const app = express();
 
@@ -46,5 +52,17 @@ app.use(
   authorizationRoutes
 );
 app.use("/api/orders", orderRoutes);
+app.use("/api/executions", executionRoutes);
+app.use("/api/positions", positionRoutes);
+app.use("/api/strategies", strategyRoutes);
+app.use(
+  "/api/strategy-assignments",
+  strategyAssignmentRoutes
+);
+app.use(
+  "/api/strategy-signals",
+  strategySignalRoutes
+);
+app.use("/api/audit-logs", auditRoutes);
 
 module.exports = app;
